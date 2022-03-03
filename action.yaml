@@ -8,18 +8,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: install asdf
+    - name: Install asdf
       uses: asdf-vm/actions/setup@v1
 
-    - name: install asdf savi plugin
+    - name: Install asdf plugin for Savi
       shell: bash
       run: asdf plugin add savi https://github.com/savi-lang/asdf-savi.git
 
-    - name: install savi
+    - name: Install specified Savi version
       uses: asdf-vm/actions/install@v1
       with:
         tool_versions: savi ${{inputs.version}}
 
-    - name: select savi
+    - name: Select specified Savi version locally
       shell: bash
-      run: asdf global savi ${{inputs.version}}
+      run: asdf local savi ${{inputs.version}}
