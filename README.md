@@ -9,6 +9,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: savi-lang/action-install@v0.1.0
+      - uses: savi-lang/action-install@v1.0.0
       - run: savi eval 'env.out.print("Savi is installed!")'
 ```
