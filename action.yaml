@@ -1,0 +1,25 @@
+name: Install Savi
+description: A GitHub Action to install Savi in the current job runner.
+inputs:
+  version:
+    description: The version of Savi to install.
+    required: false
+    default: latest
+runs:
+  using: "composite"
+  steps:
+    - name: install asdf
+      uses: asdf-vm/actions/setup@v1
+
+    - name: install asdf savi plugin
+      shell: bash
+      run: asdf plugin add savi https://github.com/savi-lang/asdf-savi.git
+
+    - name: install savi
+      uses: asdf-vm/actions/install@v1
+      with:
+        tool_versions: savi ${{inputs.version}}
+
+    - name: select savi
+      shell: bash
+      run: asdf global savi ${{inputs.version}}
