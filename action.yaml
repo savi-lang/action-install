@@ -8,18 +8,50 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - if: ${{ runner.os == 'Windows' }}
+      name: Set up Windows Subsystem for Linux
+      uses: Vampire/setup-wsl@v1
+      with:
+        update: true
+        additional-packages: ca-certificates curl git
+        # Specify a custom shell command to avoid setting the `--norc` option,
+        # and to add the `-i`, which both ensure `asdf` shims work properly.
+        wsl-shell-command: bash -i -euo pipefail '%wslScriptFile%'
+
     - name: Install asdf
       uses: asdf-vm/actions/setup@v1
+      if: ${{ runner.os != 'Windows' }}
+    - if: ${{ runner.os == 'Windows' }}
+      name: Install asdf
+      shell: wsl-bash {0}
+      run: |
+        git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.0
+        echo '. $HOME/.asdf/asdf.sh' >> ~/.bashrc
 
     - name: Install asdf plugin for Savi
       shell: bash
+      run: asdf plugin add savi https://github.com/savi-lang/asdf-savi.git
+      if: ${{ runner.os != 'Windows' }}
+    - if: ${{ runner.os == 'Windows' }}
+      name: Install asdf plugin for Savi
+      shell: 'wsl-bash {0}'
       run: asdf plugin add savi https://github.com/savi-lang/asdf-savi.git
 
     - name: Install specified Savi version
       uses: asdf-vm/actions/install@v1
       with:
-        tool_versions: savi ${{inputs.version}}
+        tool_versions: savi ${{ inputs.version }}
+      if: ${{ runner.os != 'Windows' }}
+    - if: ${{ runner.os == 'Windows' }}
+      name: Install specified Savi version
+      shell: wsl-bash {0}
+      run: asdf install savi ${{ inputs.version }}
 
     - name: Select specified Savi version locally
       shell: bash
-      run: asdf local savi ${{inputs.version}}
+      run: asdf local savi ${{ inputs.version }}
+      if: ${{ runner.os != 'Windows' }}
+    - if: ${{ runner.os == 'Windows' }}
+      name: Select specified Savi version locally
+      shell: 'wsl-bash {0}'
+      run: asdf local savi ${{ inputs.version }}
